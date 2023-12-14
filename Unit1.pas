@@ -1,13 +1,13 @@
-Unit Unit1;
+unit Unit1;
 
-Interface
+interface
 
-Uses
+uses
   SysUtils, Classes, Controls, Forms, Dialogs, ComCtrls, StdCtrls, ShellCtrls,
-  INIfiles;
+  INIfiles, FileCtrl;
 
-Type
-  TForm1 = Class(TForm)
+type
+  TForm1 = class(TForm)
     lblFolder: TLabel;
     lblWhat: TLabel;
     txtWhat: TEdit;
@@ -30,104 +30,104 @@ Type
     txtDepth: TEdit;
     lblDepth: TLabel;
     lblDepth2: TLabel;
-    Procedure cmdGoClick(Sender: TObject);
-    Procedure FormCreate(Sender: TObject);
-    Procedure FormClose(Sender: TObject; Var Action: TCloseAction);
-    Procedure cmdHelpClick(Sender: TObject);
-    Procedure GetAllSubFolders(sPath: String; FolderDepth: Integer);
-  Private
+    procedure cmdGoClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure cmdHelpClick(Sender: TObject);
+    procedure GetAllSubFolders(sPath: string; FolderDepth: Integer);
+  private
     { Private declarations }
-  Public
+  public
     { Public declarations }
-  End;
+  end;
 
-Var
+var
   Form1: TForm1;
   C: TShellTreeView;
   FilesNames: TStringList;
 
-Implementation
+implementation
 
 {$R *.dfm}
 
-Function GetSizeOfDir(dir: String; subdir: Boolean): Int64;
-Var
+function GetSizeOfDir(dir: string; subdir: Boolean): Int64;
+var
   rec: TSearchRec;
   found: Integer;
-Begin
+begin
   Result := 0;
-  If dir[Length(dir)] <> '\' Then
+  if dir[Length(dir)] <> '\' then
     dir := dir + '\';
   found := FindFirst(dir + '*.*', faAnyFile, rec);
-  While found = 0 Do
-  Begin
+  while found = 0 do
+  begin
     Inc(Result, rec.Size);
-    If (rec.Attr And faDirectory > 0) And (rec.Name[1] <> '.') And (subdir = True) Then
+    if (rec.Attr and faDirectory > 0) and (rec.Name[1] <> '.') and (subdir = True) then
       Inc(Result, GetSizeOfDir(dir + rec.Name, True));
     found := FindNext(rec);
-  End;
+  end;
   FindClose(rec);
-End;
+end;
 
-Function GetSizeOfFile(Const FileName: String): Int64;
-Var
+function GetSizeOfFile(const FileName: string): Int64;
+var
   Rec: TSearchRec;
-Begin
+begin
   Result := 0;
   //Find what we assume is a file and get its size
-  If (FindFirst(FileName, faAnyFile, Rec) = 0) Then
+  if (FindFirst(FileName, faAnyFile, Rec) = 0) then
     Result := Rec.Size;
   //If the file happens to have a folder attribute, get its size recursively
-  If ((Rec.Attr And faDirectory) = faDirectory) Then
+  if ((Rec.Attr and faDirectory) = faDirectory) then
     Result := GetSizeOfDir(FileName, True); //True ios for sub-folders
   //Close record
   FindClose(Rec);
-End;
+end;
 
-Function ExtractFileNameWoExt(Const FileName: String): String;
-Var
+function ExtractFileNameWoExt(const FileName: string): string;
+var
   i: integer;
-Begin
+begin
   i := LastDelimiter('.' + PathDelim + DriveDelim, FileName);
-  If (i = 0) Or (FileName[i] <> '.') Then
+  if (i = 0) or (FileName[i] <> '.') then
     i := MaxInt;
   Result := ExtractFileName(Copy(FileName, 1, i - 1));
-End;
+end;
 
-Procedure TForm1.FormCreate(Sender: TObject);
-Var
+procedure TForm1.FormCreate(Sender: TObject);
+var
   myINI: TINIFile;
-  ThisSetting: String;
-Begin
+  ThisSetting: string;
+begin
   //Initialise options from INI file
   myINI := TINIFile.Create(ExtractFilePath(Application.EXEName) + 'DirList.ini');
   txtFilter.text := myINI.ReadString('Settings', 'Filter', '*.*');
   ThisSetting := myINI.ReadString('Settings', 'SizeChoice', 'All');
-  If ThisSetting = 'All' Then
+  if ThisSetting = 'All' then
     rbAll.Checked := true
-  Else If ThisSetting = 'Smaller' Then
+  else if ThisSetting = 'Smaller' then
     rbSmaller.Checked := true
-  Else
+  else
     rbLarger.Checked := true;
   txtSize.text := IntToStr(myINI.ReadInteger('Settings', 'SizeValue', 0));
   ThisSetting := myINI.ReadString('Settings', 'FilesFolders', 'Files');
-  If ThisSetting = 'Files' Then
+  if ThisSetting = 'Files' then
     rbFiles.Checked := true
-  Else If ThisSetting = 'Folders' Then
+  else if ThisSetting = 'Folders' then
     rbFolders.Checked := true
-  Else
+  else
     rbBoth.Checked := true;
   txtDepth.Text := IntToStr(myINI.ReadInteger('Settings', 'Depth', 0));
   txtWhat.text := myINI.ReadString('Settings', 'What', 'N,123,SM');
   txtWhere.text := myINI.ReadString('Settings', 'Where', 'output.csv');
   myINI.Free;
   C := TShellTreeView.Create(Self);
-  With C Do
-  Begin
+  with C do
+  begin
     Left := 8;
-    Top := 32;
-    Width := 329;
-    Height := 369;
+    Top := lblFolder.Top + lblfolder.Height + 8;
+    Width := cmdGo.Left - left - 8;
+    Height := cmdGo.Top + cmdGo.Height - Top;
     Visible := True;
     Parent := Self;
     ObjectTypes := [otFolders];
@@ -139,53 +139,53 @@ Begin
     RightClickSelect := True;
     ShowRoot := False;
     TabOrder := 0;
-  End;
-End;
+  end;
+end;
 
-Procedure TForm1.FormClose(Sender: TObject; Var Action: TCloseAction);
-Var
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+var
   myINI: TIniFile;
-  ThisSetting: String;
-Begin
+  ThisSetting: string;
+begin
   //Save settings to INI file
   myINI := TINIFile.Create(ExtractFilePath(Application.EXEName) + 'DirList.ini');
   myINI.WriteString('Settings', 'Filter', txtFilter.text);
-  If rbAll.Checked Then
+  if rbAll.Checked then
     ThisSetting := 'All'
-  Else If rbSmaller.Checked Then
+  else if rbSmaller.Checked then
     ThisSetting := 'Smaller'
-  Else
+  else
     ThisSetting := 'Larger';
   myINI.WriteString('Settings', 'SizeChoice', ThisSetting);
   myINI.WriteInteger('Settings', 'SizeValue', StrToInt(txtSize.text));
-  If rbFiles.Checked Then
+  if rbFiles.Checked then
     ThisSetting := 'Files'
-  Else If rbFolders.Checked Then
+  else if rbFolders.Checked then
     ThisSetting := 'Folders'
-  Else
+  else
     ThisSetting := 'Both';
   myINI.WriteString('Settings', 'FilesFolders', ThisSetting);
   myINI.WriteInteger('Settings', 'Depth', StrToInt(txtDepth.text));
   myINI.WriteString('Settings', 'What', txtWhat.text);
   myINI.WriteString('Settings', 'Where', txtWhere.text);
   myINI.Free;
-End;
+end;
 
-Procedure TForm1.cmdHelpClick(Sender: TObject);
-Begin
+procedure TForm1.cmdHelpClick(Sender: TObject);
+begin
   ShowMessage('D: drive' + sLineBreak + 'P: path' + sLineBreak + 'F: folder' + sLineBreak + 'N: name w/o extension' + sLineBreak + 'NE: name w/ extension' + sLineBreak + 'E: extension' + sLineBreak + 'SB: size in bytes' + sLineBreak + 'SK: size in KB' + sLineBreak + 'SM: sizein MB' + sLineBreak + 'A: attributes' + sLineBreak + 'Other: text as typed');
-End;
+end;
 
-Procedure TForm1.cmdGoClick(Sender: TObject);
-Var
-  Path, FullName: String;
-  OutD, OutP, OutF, OutN, OutNE, OutE, outSB, outSK, outSM, outA, OutputString: String;
+procedure TForm1.cmdGoClick(Sender: TObject);
+var
+  Path, FullName: string;
+  OutD, OutP, OutF, OutN, OutNE, OutE, outSB, outSK, outSM, outA, OutputString: string;
   List: TStrings;
   ThisFileSize, SizeLimit: Int64;
   i, j, FileAttributes, FilesListed: Integer;
   OutputFile: TextFile;
   AppendToFile: Boolean;
-Begin
+begin
   //Get Path for ShellTreeView
   Path := IncludeTrailingPathDelimiter(C.Path);
   //Create list of files names from selected path
@@ -199,16 +199,16 @@ Begin
   AssignFile(OutputFile, PChar(txtWhere.Text));
   //Check if file exists
   AppendToFile := False;
-  If fileexists(PChar(txtWhere.Text)) Then
-    If messagedlg('The output file already exists.' + #13#10 + 'Do you want to append to it (no to overwrite)? ', mtCustom, [mbYes, mbNo], 0) = mrYes Then
+  if fileexists(PChar(txtWhere.Text)) then
+    if messagedlg('The output file already exists.' + #13#10 + 'Do you want to append to it (no to overwrite)? ', mtCustom, [mbYes, mbNo], 0) = mrYes then
       AppendToFile := True;
-  If AppendToFile Then
+  if AppendToFile then
     append(OutputFile)
-  Else
+  else
     ReWrite(OutputFile);
   FilesListed := 0;
-  For i := 0 To FilesNames.Count - 1 Do
-  Begin
+  for i := 0 to FilesNames.Count - 1 do
+  begin
     //Prepare properties values
     FullName := FilesNames[i];
     OutD := ExtractFileDrive(FullName);
@@ -219,102 +219,102 @@ Begin
     OutE := ExtractFileExt(FullName);
     ThisFileSize := GetSizeOfFile(FullName);
     outSB := IntToStr(ThisFileSize);
-    outSK := IntToStr(ThisFileSize Div 1024);
-    outSM := IntToStr(ThisFileSize Div 1048576);
+    outSK := IntToStr(ThisFileSize div 1024);
+    outSM := IntToStr(ThisFileSize div 1048576);
     //If comma (,) in names/path strings, encompass in double quotes (")
     //This ensures the CSV file doesn't think these commas define extra columns
-    If Pos(',', OutP) > 0 Then
+    if Pos(',', OutP) > 0 then
       OutP := '"' + OutP + '"';
-    If Pos(',', OutF) > 0 Then
+    if Pos(',', OutF) > 0 then
       OutF := '"' + OutF + '"';
-    If Pos(',', OutN) > 0 Then
-    Begin
+    if Pos(',', OutN) > 0 then
+    begin
       OutN := '"' + OutN + '"';
       OutNE := '"' + OutNE + '"';
-    End;
+    end;
     //File attributes
     FileAttributes := filegetattr(FullName);
     outA := '';
-    If FileAttributes And faReadOnly > 0 Then
+    if FileAttributes and faReadOnly > 0 then
       outA := outA + 'R';
-    If FileAttributes And faHidden > 0 Then
+    if FileAttributes and faHidden > 0 then
       outA := outA + 'H';
-    If FileAttributes And faSysFile > 0 Then
+    if FileAttributes and faSysFile > 0 then
       outA := outA + 'S';
-    If FileAttributes And faArchive > 0 Then
+    if FileAttributes and faArchive > 0 then
       outA := outA + 'A';
     OutputString := '';
     //Export file if size limit is met
-    ThisFileSize := ThisFileSize Div 1048576;
-    If rbAll.Checked Or (rbSmaller.Checked And (ThisFileSize < SizeLimit)) Or (rbLarger.Checked And (ThisFileSize > SizeLimit)) Then
-    Begin
-      For j := 0 To List.Count - 1 Do
-      Begin
-        If List[j] = 'D' Then
+    ThisFileSize := ThisFileSize div 1048576;
+    if rbAll.Checked or (rbSmaller.Checked and (ThisFileSize < SizeLimit)) or (rbLarger.Checked and (ThisFileSize > SizeLimit)) then
+    begin
+      for j := 0 to List.Count - 1 do
+      begin
+        if List[j] = 'D' then
           OutputString := OutputString + OutD
-        Else If List[j] = 'P' Then
+        else if List[j] = 'P' then
           OutputString := OutputString + OutP
-        Else If List[j] = 'F' Then
+        else if List[j] = 'F' then
           OutputString := OutputString + OutF
-        Else If List[j] = 'N' Then
+        else if List[j] = 'N' then
           OutputString := OutputString + OutN
-        Else If List[j] = 'NE' Then
+        else if List[j] = 'NE' then
           OutputString := OutputString + OutNE
-        Else If List[j] = 'E' Then
+        else if List[j] = 'E' then
           OutputString := OutputString + OutE
-        Else If List[j] = 'SB' Then
+        else if List[j] = 'SB' then
           OutputString := OutputString + outSB
-        Else If List[j] = 'SK' Then
+        else if List[j] = 'SK' then
           OutputString := OutputString + outSK
-        Else If List[j] = 'SM' Then
+        else if List[j] = 'SM' then
           OutputString := OutputString + outSM
-        Else If List[j] = 'A' Then
+        else if List[j] = 'A' then
           OutputString := OutputString + outA
-        Else
+        else
           OutputString := OutputString + List[j];
-        If j < (List.count - 1) Then
+        if j < (List.count - 1) then
           OutputString := OutputString + ',';
-      End;
+      end;
       WriteLn(OutputFile, OutputString);
       FilesListed := FilesListed + 1;
-    End;
-  End;
+    end;
+  end;
   //Close the file
   CloseFile(OutputFile);
   List.Free;
-  If AppendToFile Then
+  if AppendToFile then
     showmessage('Added information for ' + IntToStr(FilesListed) + ' files to the file ' + PChar(txtWhere.Text))
-  Else
+  else
     showmessage('Wrote information for ' + IntToStr(FilesListed) + ' files to the file ' + PChar(txtWhere.Text));
-End;
+end;
 
-Procedure TForm1.GetAllSubFolders(sPath: String; FolderDepth: Integer);
-Var
-  Path: String;
+procedure TForm1.GetAllSubFolders(sPath: string; FolderDepth: Integer);
+var
+  Path: string;
   Rec: TSearchRec;
-Begin
-  Try
+begin
+  try
     Path := IncludeTrailingBackslash(sPath);
-    If FindFirst(Path + PChar(txtFilter.Text), faDirectory, Rec) = 0 Then
-    Try
-      Repeat
-        If (Rec.Name <> '.') And (Rec.Name <> '..') Then
-        Begin
+    if FindFirst(Path + PChar(txtFilter.Text), faDirectory, Rec) = 0 then
+    try
+      repeat
+        if (Rec.Name <> '.') and (Rec.Name <> '..') then
+        begin
           //Only add to list if matches requirements, i.e. files only, folders only or both
-          If rbBoth.Checked Or (rbFiles.Checked And Not ((Rec.Attr And faDirectory) = faDirectory)) Or (rbFolders.Checked And ((Rec.Attr And faDirectory) = faDirectory)) Then
+          if rbBoth.Checked or (rbFiles.Checked and not ((Rec.Attr and faDirectory) = faDirectory)) or (rbFolders.Checked and ((Rec.Attr and faDirectory) = faDirectory)) then
             FilesNames.add(Path + Rec.Name);
-          If (FolderDepth < StrToInt(txtDepth.Text)) Or (StrToInt(txtDepth.Text) = -1) Then
+          if (FolderDepth < StrToInt(txtDepth.Text)) or (StrToInt(txtDepth.Text) = -1) then
             GetAllSubFolders(Path + Rec.Name, FolderDepth + 1);
-        End;
-      Until FindNext(Rec) <> 0;
-    Finally
+        end;
+      until FindNext(Rec) <> 0;
+    finally
       FindClose(Rec);
-    End;
-  Except
-    On e: Exception Do
+    end;
+  except
+    on e: Exception do
       Showmessage('Error: ' + e.Message);
-  End;
-End;
+  end;
+end;
 
-End.
+end.
 

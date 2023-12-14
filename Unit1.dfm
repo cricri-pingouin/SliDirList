@@ -4,12 +4,12 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Directory Lister'
-  ClientHeight = 410
-  ClientWidth = 632
+  ClientHeight = 333
+  ClientWidth = 514
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -13
+  Font.Height = -10
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   Icon.Data = {
@@ -86,50 +86,50 @@ object Form1: TForm1
   OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
-  PixelsPerInch = 120
-  TextHeight = 16
+  PixelsPerInch = 96
+  TextHeight = 13
   object lblFolder: TLabel
-    Left = 8
-    Top = 8
-    Width = 167
-    Height = 16
+    Left = 7
+    Top = 7
+    Width = 133
+    Height = 13
     Caption = 'Select folder to list files from:'
   end
   object lblWhat: TLabel
-    Left = 345
-    Top = 256
-    Width = 221
-    Height = 16
+    Left = 280
+    Top = 208
+    Width = 176
+    Height = 13
     Caption = 'Properties to export (separate with '#39','#39'):'
   end
   object lblWhere: TLabel
-    Left = 344
-    Top = 312
-    Width = 195
-    Height = 16
+    Left = 280
+    Top = 254
+    Width = 160
+    Height = 13
     Caption = 'Name of the output text (CSV) file:'
   end
   object lblFilter: TLabel
-    Left = 344
-    Top = 8
-    Width = 96
-    Height = 16
+    Left = 280
+    Top = 7
+    Width = 75
+    Height = 13
     Caption = 'Files name filter:'
   end
   object cmdGo: TButton
-    Left = 344
-    Top = 368
-    Width = 281
-    Height = 33
+    Left = 278
+    Top = 298
+    Width = 228
+    Height = 27
     Caption = 'Create output'
     TabOrder = 6
     OnClick = cmdGoClick
   end
   object txtWhat: TEdit
-    Left = 344
-    Top = 280
-    Width = 249
-    Height = 24
+    Left = 280
+    Top = 228
+    Width = 202
+    Height = 21
     Hint = 'Example:'#13#10'N,123,SM = name without extension,123,size in MB'
     ParentShowHint = False
     ShowHint = True
@@ -137,10 +137,10 @@ object Form1: TForm1
     Text = 'N,123,SM'
   end
   object txtWhere: TEdit
-    Left = 344
-    Top = 336
-    Width = 281
-    Height = 24
+    Left = 280
+    Top = 273
+    Width = 228
+    Height = 21
     Hint = 
       'You can give an extension other than .csv (e.g. .txt)'#13#10'CSV is co' +
       'nvenient because file will open in Excel'
@@ -150,10 +150,10 @@ object Form1: TForm1
     Text = 'output.csv'
   end
   object txtFilter: TEdit
-    Left = 344
-    Top = 30
-    Width = 281
-    Height = 24
+    Left = 280
+    Top = 24
+    Width = 228
+    Height = 21
     Hint = 'Examples:'#13#10'*.* = all'#13#10'*.mp3 = all .mp3 files'
     ParentShowHint = False
     ShowHint = True
@@ -161,59 +161,59 @@ object Form1: TForm1
     Text = '*.*'
   end
   object cmdHelp: TButton
-    Left = 600
-    Top = 280
-    Width = 25
-    Height = 25
+    Left = 488
+    Top = 228
+    Width = 20
+    Height = 20
     Caption = '?'
     TabOrder = 4
     OnClick = cmdHelpClick
   end
   object grpSize: TGroupBox
-    Left = 344
-    Top = 64
-    Width = 281
-    Height = 65
+    Left = 280
+    Top = 52
+    Width = 228
+    Height = 53
     Caption = 'Files size filter'
     TabOrder = 1
     object lblMB: TLabel
-      Left = 240
-      Top = 33
-      Width = 20
-      Height = 16
+      Left = 195
+      Top = 27
+      Width = 16
+      Height = 13
       Caption = 'MB'
     end
     object rbAll: TRadioButton
-      Left = 8
-      Top = 32
-      Width = 49
-      Height = 25
+      Left = 7
+      Top = 26
+      Width = 39
+      Height = 20
       Caption = 'All'
       Checked = True
       TabOrder = 0
       TabStop = True
     end
     object rbSmaller: TRadioButton
-      Left = 56
-      Top = 32
-      Width = 49
-      Height = 25
+      Left = 46
+      Top = 26
+      Width = 39
+      Height = 20
       Caption = '<'
       TabOrder = 1
     end
     object rbLarger: TRadioButton
-      Left = 96
-      Top = 32
-      Width = 49
-      Height = 25
+      Left = 78
+      Top = 26
+      Width = 40
+      Height = 20
       Caption = '>'
       TabOrder = 2
     end
     object txtSize: TEdit
-      Left = 136
-      Top = 33
-      Width = 97
-      Height = 24
+      Left = 111
+      Top = 27
+      Width = 78
+      Height = 21
       Hint = 
         'Since folders have a 0 size,'#13#10'setting a limit >0 will exclude fo' +
         'lders'
@@ -224,57 +224,57 @@ object Form1: TForm1
     end
   end
   object grpFilesFolders: TGroupBox
-    Left = 344
-    Top = 144
-    Width = 281
-    Height = 97
+    Left = 280
+    Top = 117
+    Width = 228
+    Height = 79
     Caption = 'Files and/or folders'
     TabOrder = 2
     object lblDepth: TLabel
-      Left = 8
-      Top = 64
-      Width = 98
-      Height = 16
+      Left = 7
+      Top = 52
+      Width = 78
+      Height = 13
       Caption = 'Hierarchy depth:'
     end
     object lblDepth2: TLabel
-      Left = 192
-      Top = 64
-      Width = 76
-      Height = 16
+      Left = 156
+      Top = 52
+      Width = 58
+      Height = 13
       Caption = 'folders deep'
     end
     object rbFiles: TRadioButton
-      Left = 8
-      Top = 32
-      Width = 81
-      Height = 25
+      Left = 7
+      Top = 26
+      Width = 65
+      Height = 20
       Caption = 'Files'
       Checked = True
       TabOrder = 0
       TabStop = True
     end
     object rbFolders: TRadioButton
-      Left = 64
-      Top = 32
-      Width = 73
-      Height = 25
+      Left = 52
+      Top = 26
+      Width = 59
+      Height = 20
       Caption = 'Folders'
       TabOrder = 1
     end
     object rbBoth: TRadioButton
-      Left = 144
-      Top = 32
-      Width = 121
-      Height = 25
+      Left = 117
+      Top = 26
+      Width = 98
+      Height = 20
       Caption = 'Files and folders'
       TabOrder = 2
     end
     object txtDepth: TEdit
-      Left = 112
-      Top = 64
-      Width = 73
-      Height = 24
+      Left = 91
+      Top = 52
+      Width = 59
+      Height = 21
       Hint = '-1 = any depth'#13#10'0 = this folder only'#13#10'x = up to x levels deep'
       ParentShowHint = False
       ShowHint = True
